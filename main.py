@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, computed_field
 from typing import Annotated, Literal, Optional
 from sqlalchemy.orm import Session
 import models
-from database import engine, SessionLocal
+from app.database.database import engine, SessionLocal
 
 # 1. Create the database tables
 models.Base.metadata.create_all(bind=engine)
