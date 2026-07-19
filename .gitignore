@@ -21,3 +21,15 @@ __pycache__/
 
 # Other unnecessary files
 *.pdf
+venv/
+__pycache__/
+*.pyc
+
+.env
+
+.pytest_cache/
+
+patients.db
+
+.vscode/
+.idea/
