@@ -3,11 +3,11 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, computed_field
 from typing import Annotated, Literal, Optional
 from sqlalchemy.orm import Session
-import models
+from app.models import patient
 from app.database.database import engine, SessionLocal
 
 # 1. Create the database tables
-models.Base.metadata.create_all(bind=engine)
+patient.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -70,7 +70,7 @@ def about():
 @app.get('/view')
 def view(db: Session = Depends(get_db)):
     # SQL Query: SELECT * FROM patients
-    patients = db.query(models.Patient).all()
+    patients = db.query(patient.Patient).all()
     return patients
 
 @app.get('/patient/{patient_id}')
@@ -79,7 +79,7 @@ def view_patient(
     db: Session = Depends(get_db)
 ):
     # SQL Query: SELECT * FROM patients WHERE id = patient_id
-    patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    patient = db.query(patient.Patient).filter(patient.Patient.id == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
     return patient
@@ -99,7 +99,7 @@ def sort_patients(
     
     # We fetch all data and sort in Python to match your exact previous logic
     # (SQL can do this too with order_by, but this preserves your logic perfectly)
-    patients = db.query(models.Patient).all()
+    patients = db.query(patient.Patient).all()
     
     # Convert SQL objects to dictionary-like objects for sorting if needed, 
     # or just sort the objects based on the attribute
@@ -112,7 +112,7 @@ def sort_patients(
 @app.post('/create')
 def create_patient(patient: PatientDTO, db: Session = Depends(get_db)):
     # Check if exists
-    existing_patient = db.query(models.Patient).filter(models.Patient.id == patient.id).first()
+    existing_patient = db.query(patient.Patient).filter(patient.Patient.id == patient.id).first()
     if existing_patient:
         raise HTTPException(status_code=400, detail="Patient with this ID already exists")
     
@@ -120,7 +120,7 @@ def create_patient(patient: PatientDTO, db: Session = Depends(get_db)):
     patient_data = patient.model_dump()
     
     # Create SQL Model
-    db_patient = models.Patient(**patient_data)
+    db_patient = patient.Patient(**patient_data)
     
     # Add and Commit
     db.add(db_patient)
@@ -132,7 +132,7 @@ def create_patient(patient: PatientDTO, db: Session = Depends(get_db)):
 @app.put('/update/{patient_id}')
 def update_patient(patient_id: str, patient_update: PatientUpdate, db: Session = Depends(get_db)):
     # Find patient
-    db_patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    db_patient = db.query(patient.Patient).filter(patient.Patient.id == patient_id).first()
     if not db_patient:
         raise HTTPException(status_code=404, detail="Patient not found")
     
@@ -173,7 +173,7 @@ def update_patient(patient_id: str, patient_update: PatientUpdate, db: Session =
 
 @app.delete('/delete/{patient_id}')
 def delete_patient(patient_id: str, db: Session = Depends(get_db)):
-    db_patient = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    db_patient = db.query(patient.Patient).filter(patient.Patient.id == patient_id).first()
     if not db_patient:
         raise HTTPException(status_code=404, detail="Patient not found")
                              
