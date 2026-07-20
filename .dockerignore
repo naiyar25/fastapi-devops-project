@@ -1,0 +1,13 @@
+venv/
+.git/
+.pytest_cache/
+__pycache__/
+*.pyc
+patients.db
+tests/
+docs/
+terraform/
+monitoring/
+iam/
+kubernetes/
+.env
